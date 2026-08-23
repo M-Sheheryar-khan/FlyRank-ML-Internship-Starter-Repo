@@ -5,6 +5,8 @@
 - **Repo:** https://github.com/M-Sheheryar-khan/FlyRank-ML-Internship-Starter-Repo
 - **Date:** August 2026
 
+> **Headline result:** On a client-held-out split, a learned model beat both the hand-written baseline rule and random ranking at precision@50 (0.36 vs a 0.274 base rate) — but a naive random split had overstated that same model's performance (ROC-AUC 0.616 vs an honest 0.565), because clients leaked across train and test. That gap is the project's core finding.
+
 ## 0. Abstract
 
 Content teams with limited review time need to know which pages to check first. This project
@@ -111,6 +113,10 @@ editorial style and template effects that a random row split would let a model m
 | baseline rule | 0.000 | 0.100 | 0.502 |
 | logistic regression | 0.100 | 0.360 | 0.565 |
 | base rate (random ranking) | 0.274 | 0.274 | 0.500 |
+
+![Action queue by position tier](figures/action_by_position_tier.png)
+
+*The `review_ctr` queue concentrates in the 4-10 and 21+ position tiers, where the CTR gap against each tier's own norm is largest.*
 
 **What the errors look like:** the three highest-confidence wrong predictions were all
 low-volume pages (34–68 impressions over 15 days), ranking poorly (position 28–41), with
