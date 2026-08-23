@@ -114,7 +114,13 @@ editorial style and template effects that a random row split would let a model m
 | logistic regression | 0.100 | 0.360 | 0.565 |
 | base rate (random ranking) | 0.274 | 0.274 | 0.500 |
 
-![Action queue by position tier](figures/action_by_position_tier.png)
+![Model vs baseline vs random](figures/model_vs_baseline.png)
+
+*The learned model clears the baseline and random ranking at precision@50, but none of the three beat random at precision@20 — the top of the ranking isn't where the real lift shows up.*
+
+![Validation design gap](figures/split_design_gap.png)
+
+*The naive random split (left) reports a higher precision@20 and ROC-AUC than the honest client-grouped split (right) — because 38 clients leaked across train and test in the random version. The gap between the two bars is the size of that leakage effect.*
 
 *The `review_ctr` queue concentrates in the 4-10 and 21+ position tiers, where the CTR gap against each tier's own norm is largest.*
 
@@ -129,6 +135,10 @@ where the label itself is noisiest (a single slow day can flip the 0.8× thresho
 None towers over the rest the way a leaked feature would — a mild spread across several
 plausible signals, not a single suspiciously perfect predictor.
 
+![Feature importance](figures/feature_importance.png)
+
+*No single feature dominates — importance spreads across several plausible signals rather than concentrating on one, which is what you'd want to see if nothing leaked in.*
+
 ## 6. Interpretation
 
 **Signal audit (Week 4), stated plainly:**
@@ -136,9 +146,18 @@ plausible signals, not a single suspiciously perfect predictor.
   had been updated within the last 90 days; decline rate did not rise with staleness
   (37.1% → 33.5% → 38.5% across the three age buckets), and the oldest bucket had only 26
   rows. Staleness is not a usable signal on this slice and was dropped from the rule.
+
+  ![Staleness signal, verdict FALSE](figures/staleness_signal_false.png)
+
+*Decline rate barely moves across staleness buckets, and the oldest bucket has only 26 pages — not enough to trust even if the pattern looked cleaner. This is what a negative result looks like: honestly shown, not hidden.*
+
 - **CTR-vs-position verdict: CONFIRMED.** Weighted CTR fell from 0.449% (position 1–3) to
   0.328–0.337% (position 4–20) to 0.135% (21+), across large buckets (n = 11,583 / 49,444 /
   21,597 / 26,958). This is the signal the baseline rule is built on.
+
+  ![CTR vs position tier](figures/ctr_by_position_tier.png)
+
+*Actual CTR tracks closely with the tier norm for most pages, which is exactly why the gap — when it does appear — is a meaningful signal rather than noise.*
 
 **The validation-design finding (Week 6), which is arguably the most important result in this
 project:** the same model, evaluated on a naive random row split instead of a client-grouped
@@ -164,6 +183,10 @@ confirm here.
 by `work/notebooks/w07_action_playbook.ipynb`): pages are flagged `review_ctr` when they carry
 real traffic but underperform their position tier's expected click rate, with priority set by
 `impressions × ctr_gap`. All other pages are `monitor`.
+
+![Action queue by position tier](figures/action_by_position_tier.png)
+
+*The `review_ctr` queue concentrates in the 4-10 and 21+ position tiers, where the CTR gap against each tier's own norm is largest.*
 
 **How a FlyRank editor would use this tomorrow:** open the top of the `review_ctr` queue,
 check query intent and whether a SERP feature is capturing clicks before editing anything, then
