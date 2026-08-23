@@ -1,0 +1,3 @@
+theme: jekyll-theme-cayman
+title: Content Opportunity Scoring — FlyRank Capstone
+description: A validated baseline-vs-model comparison for prioritizing content review, built on FlyRank's search warehouse data.
